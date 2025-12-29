@@ -9,7 +9,7 @@ var map = new ol.Map({
 });
 
 //initial view - epsg:3857 coordinates if not "Match project CRS"
-map.getView().fit([12325628.780843, -770785.733530, 12328958.887375, -767872.536016], map.getSize());
+map.getView().fit([12325153.084760, -771042.681091, 12329699.574565, -768093.413895], map.getSize());
 
 //full zooms only
 map.getView().setProperties({constrainResolution: true});
@@ -494,6 +494,17 @@ var bottomRightContainerDiv = document.getElementById('bottom-right-container')
 
 //title
 
+var Title = new ol.control.Control({
+    element: (() => {
+        var titleElement = document.createElement('div');
+        titleElement.className = 'top-right-title ol-control';
+        titleElement.innerHTML = '<h2 class="project-title">Peta Banjarsari</h2>';
+        return titleElement;
+    })(),
+    target: 'top-right-container'
+});
+map.addControl(Title)
+    
 //abstract
 
 
@@ -871,11 +882,6 @@ let measuring = false;
 	}
 
 
-  function convertToFeet(length) {
-    feet_length = length * 3.2808;
-    return feet_length
-  }
-
   /**
   * format length output
   * @param {ol.geom.LineString} line
@@ -891,15 +897,15 @@ let measuring = false;
         var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, 'EPSG:4326');
         length += ol.sphere.getDistance(c1, c2);
       }
-      feet_length = convertToFeet(length)
-
-      var output;
-      if (feet_length > 5280) {
-          output = (Math.round(feet_length / 5280 * 100) / 100) + ' miles';
-      } else {
-          output = (Math.round(feet_length * 100) / 100) + ' ft';
-      }
-      return output;
+    var output;
+    if (length > 100) {
+      output = (Math.round(length / 1000 * 100) / 100) +
+          ' ' + 'km';
+    } else {
+      output = (Math.round(length * 100) / 100) +
+          ' ' + 'm';
+    }
+    return output;
   };
 
   /**
@@ -907,18 +913,18 @@ let measuring = false;
   * @param {ol.geom.Polygon} polygon The polygon.
   * @return {string} Formatted area.
   */
-  var formatArea = function (polygon) {
-    var sourceProj = map.getView().getProjection();
-    var geom = polygon.clone().transform(sourceProj, 'EPSG:3857');
-    var area = Math.abs(ol.sphere.getArea(geom));
-    var output;
-    if (area > 2589988) {  // 1 sq mi in square meters
-      output = (Math.round((area / 2589988) * 1000) / 1000) + ' sq mi';
-    } else {
-      output = (Math.round(area * 10.7639 * 100) / 100) + ' sq ft';
-    }
-    return output;
-  };
+	var formatArea = function (polygon) {
+		var sourceProj = map.getView().getProjection();
+		var geom = polygon.clone().transform(sourceProj, 'EPSG:3857');
+		var area = Math.abs(ol.sphere.getArea(geom));
+		var output;
+		if (area > 1000000) {
+			output = Math.round((area / 1000000) * 1000) / 1000 + ' ' + 'km<sup>2</sup>';
+		} else {
+			output = Math.round(area * 100) / 100 + ' ' + 'm<sup>2</sup>';
+		}
+		return output.replace('.', ',');
+	};
 
   addInteraction();
 
@@ -931,185 +937,9 @@ let measuring = false;
 
 //geocoder
 
-  //Layer to represent the point of the geocoded address
-  var geocoderLayer = new ol.layer.Vector({
-      source: new ol.source.Vector(),
-  });
-  map.addLayer(geocoderLayer);
-  var vectorSource = geocoderLayer.getSource();
-
-  //Variable used to store the coordinates of geocoded addresses
-  var obj2 = {
-  value: '',
-  letMeKnow() {
-      //console.log(`Geocoded position: ${this.gcd}`);
-  },
-  get gcd() {
-      return this.value;
-  },
-  set gcd(value) {
-      this.value = value;
-      this.letMeKnow();
-  }
-  }
-
-  var obj = {
-      value: '',
-      get label() {
-          return this.value;
-      },
-      set label(value) {
-          this.value = value;
-      }
-  }
-
-  // Function to handle the selected address
-  function onSelected(feature) {
-      obj.label = feature;
-      input.value = typeof obj.label.properties.label === "undefined"? obj.label.properties.display_name : obj.label.properties.label;
-      var coordinates = ol.proj.transform(
-      [feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
-      "EPSG:4326",
-      map.getView().getProjection()
-      );
-      vectorSource.clear(true);
-      obj2.gcd = [feature.geometry.coordinates[0], feature.geometry.coordinates[1]];
-      var marker = new ol.Feature(new ol.geom.Point(coordinates));
-      var zIndex = 1;
-      marker.setStyle(new ol.style.Style({
-      image: new ol.style.Icon(({
-          anchor: [0.5, 1],
-          anchorXUnits: 'fraction',
-          anchorYUnits: 'fraction',
-          scale: 0.7,
-          opacity: 1,
-          src: "./resources/marker.png",
-          zIndex: zIndex
-      })),
-      zIndex: zIndex
-      }));
-      vectorSource.addFeature(marker);
-      map.getView().setCenter(coordinates);
-      map.getView().setZoom(18);
-  }
-
-  // Format the result in the autocomplete search bar
-  var formatResult = function (feature, el) {
-      var title = document.createElement("strong");
-      el.appendChild(title);
-      var detailsContainer = document.createElement("small");
-      el.appendChild(detailsContainer);
-      var details = [];
-      title.innerHTML = feature.properties.label || feature.properties.display_name;
-      var types = {
-      housenumber: "numéro",
-      street: "rue",
-      locality: "lieu-dit",
-      municipality: "commune",
-      };
-      if (
-      feature.properties.city &&
-      feature.properties.city !== feature.properties.name
-      ) {
-      details.push(feature.properties.city);
-      }
-      if (feature.properties.context) {
-      details.push(feature.properties.context);
-      }
-      detailsContainer.innerHTML = details.join(", ");
-  };
-
-  // Define a class to create the control button for the search bar in a div tag
-  class AddDomControl extends ol.control.Control {
-      constructor(elementToAdd, opt_options) {
-      const options = opt_options || {};
-
-      const element = document.createElement("div");
-      if (options.className) {
-          element.className = options.className;
-      }
-      element.appendChild(elementToAdd);
-
-      super({
-          element: element,
-          target: options.target,
-      });
-      }
-  }
-
-  // Function to show you can do something with the returned elements
-  function myHandler(featureCollection) {
-      //console.log(featureCollection);
-  }
-
-  // URL for API
-  const url = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&",
-  "France BAN": "https://api-adresse.data.gouv.fr/search/?"}
-  var API_URL = "//api-adresse.data.gouv.fr";
-
-  // Create search by adresses component
-  var containers = new Photon.Search({
-    resultsHandler: myHandler,
-    onSelected: onSelected,
-    placeholder: "Search an address",
-    formatResult: formatResult,
-    //url: API_URL + "/search/?",
-    url: url["Nominatim OSM"],
-    position: "topright",
-    // ,includePosition: function() {
-    //   return ol.proj.transform(
-    //     map.getView().getCenter(),
-    //     map.getView().getProjection(), //'EPSG:3857',
-    //     'EPSG:4326'
-    //   );
-    // }
-  });
-
-  // Add the created DOM element within the map
-  //var left = document.getElementById("top-left-container");
-  var controlGeocoder = new AddDomControl(containers, {
-    className: "photon-geocoder-autocomplete ol-unselectable ol-control",
-  });
-  map.addControl(controlGeocoder);
-  var search = document.getElementsByClassName("photon-geocoder-autocomplete ol-unselectable ol-control")[0];
-  search.style.display = "flex";
-
-  // Create the new button element
-  var button = document.createElement("button");
-  button.type = "button";
-  button.id = "gcd-button-control";
-  button.className = "gcd-gl-btn fa fa-search leaflet-control";
-
-  // Ajouter le bouton à l'élément parent
-  search.insertBefore(button, search.firstChild);
-  last = search.lastChild;
-  last.style.display = "none";
-  button.addEventListener("click", function (e) {
-      if (last.style.display === "none") {
-          last.style.display = "block";
-      } else {
-          last.style.display = "none";
-      }
-  });
-  input = document.getElementsByClassName("photon-input")[0];
-  //var searchbar = document.getElementsByClassName("photon-geocoder-autocomplete ol-unselectable ol-control")[0]
-  //left.appendChild(searchbar);
-        
 
 //layer search
 
-var searchLayer = new SearchLayer({
-    layer: lyr_bidang_pbb_1,
-    colName: 'nop',
-    zoom: 10,
-    collapsed: true,
-    map: map,
-    maxResults: 10,
-});
-map.addControl(searchLayer);
-document.getElementsByClassName('search-layer')[0].getElementsByTagName('button')[0].className += ' fa fa-binoculars';
-document.getElementsByClassName('search-layer-input-search')[0].placeholder = 'Search feature ...';
-    
 
 //scalebar
 

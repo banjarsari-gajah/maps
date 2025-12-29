@@ -1,6 +1,6 @@
-var json_bidang_pbb_1 = {
+var json_BidangTanah_1 = {
 "type": "FeatureCollection",
-"name": "bidang_pbb_1",
+"name": "BidangTanah_1",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "fid": "1", "nop": "1.0007", "blok": "1", "NOP_Field2": "WINARTO", "NOP_Field3": "JL DESA RT 000 RW 00, MOJOSIMO, DEMAK" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 110.729880692996318, -6.886342601504928 ], [ 110.72968045102283, -6.886795927083817 ], [ 110.728106326620065, -6.88585312112527 ], [ 110.728287100623916, -6.885391452130818 ], [ 110.728935105899254, -6.88592543072681 ], [ 110.729880692996318, -6.886342601504928 ] ] ] ] } },

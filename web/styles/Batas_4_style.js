@@ -1,7 +1,7 @@
 var size = 0;
 var placement = 'point';
 
-var style_Jalan_2 = function(feature, resolution){
+var style_Batas_4 = function(feature, resolution){
     var context = {
         feature: feature,
         variables: {}
@@ -9,19 +9,19 @@ var style_Jalan_2 = function(feature, resolution){
     
     var labelText = ""; 
     var value = feature.get("");
-    var labelFont = "15.600000000000001px \'Open Sans\', sans-serif";
-    var labelFill = "#f5e509";
-    var bufferColor = "#000000";
-    var bufferWidth = 3.0;
+    var labelFont = "10px, sans-serif";
+    var labelFill = "#000000";
+    var bufferColor = "";
+    var bufferWidth = 0;
     var textAlign = "left";
     var offsetX = 0;
     var offsetY = 0;
     var placement = 'line';
-    if (feature.get("nama") !== null) {
-        labelText = String(feature.get("nama"));
+    if ("" !== null) {
+        labelText = String("");
     }
     var style = [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(245,155,9,1.0)', lineDash: null, lineCap: 'square', lineJoin: 'bevel', width: 15.2}),
+        stroke: new ol.style.Stroke({color: 'rgba(245,9,9,1.0)', lineDash: [10,5,10,5], lineCap: 'square', lineJoin: 'bevel', width: 3}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)

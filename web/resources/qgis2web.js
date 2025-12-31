@@ -576,7 +576,7 @@ let measuring = false;
 
 	const measureButton = document.createElement('button');
 	measureButton.className = 'measure-button fas fa-ruler';
-	measureButton.title = 'Measure';
+	measureButton.title = 'Pengukuran';
 
 	const measureControl = document.createElement('div');
 	measureControl.className = 'ol-unselectable ol-control measure-control';
@@ -631,14 +631,14 @@ let measuring = false;
     
 
     var selectLabel = document.createElement("label");
-    selectLabel.innerHTML = "&nbsp;Measure:&nbsp;";
+    selectLabel.innerHTML = "&nbsp;Pengukuran:&nbsp;";
 
     var typeSelect = document.createElement("select");
     typeSelect.id = "type";
 
     var measurementOption = [
-        { value: "LineString", description: "Length" },
-        { value: "Polygon", description: "Area" }
+        { value: "LineString", description: "Panjang" },
+        { value: "Polygon", description: "Luas" }
         ];
     measurementOption.forEach(function (option) {
         var optionElement = document.createElement("option");
@@ -950,7 +950,7 @@ var searchLayer = new SearchLayer({
 });
 map.addControl(searchLayer);
 document.getElementsByClassName('search-layer')[0].getElementsByTagName('button')[0].className += ' fa fa-binoculars';
-document.getElementsByClassName('search-layer-input-search')[0].placeholder = 'Search feature ...';
+document.getElementsByClassName('search-layer-input-search')[0].placeholder = 'Pencarian NOP ...';
     
 
 //scalebar

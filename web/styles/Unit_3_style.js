@@ -1,7 +1,7 @@
 var size = 0;
 var placement = 'point';
 
-var style_Bangunan_5 = function(feature, resolution){
+var style_Unit_3 = function(feature, resolution){
     var context = {
         feature: feature,
         variables: {}
@@ -17,8 +17,8 @@ var style_Bangunan_5 = function(feature, resolution){
     var offsetX = 0;
     var offsetY = 0;
     var placement = 'point';
-    if (feature.get("nama") !== null) {
-        labelText = String(feature.get("nama"));
+    if ("" !== null) {
+        labelText = String("");
     }
     var style = [ new ol.style.Style({
         image: new ol.style.RegularShape({radius: 8.0 + size, points: 6,
